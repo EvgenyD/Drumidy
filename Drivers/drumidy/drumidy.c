@@ -211,6 +211,8 @@ uint8_t Update_channel(DRUM* _chnl, uint32_t _adc_reading, GPIO_PinState _aux_st
 	// for fun return 1 if there is data to report
 	return (_chnl->main_rdy | _chnl->aux_rdy);
 }
+
+
 //// TODO: change algorithm to something with timer
 ////void sendMidiAS ();
 //// V 3.0, no rim

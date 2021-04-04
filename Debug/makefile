@@ -65,8 +65,8 @@ all: main-build
 main-build: Drumidy.elf secondary-outputs
 
 # Tool invocations
-Drumidy.elf: $(OBJS) $(USER_OBJS) A:\STM32\STM32CubeIDE_1.5.0\workspace\Drumidy\STM32G431KBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Drumidy.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"A:\STM32\STM32CubeIDE_1.5.0\workspace\Drumidy\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Drumidy.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Drumidy.elf: $(OBJS) $(USER_OBJS) A:\stm32\workspace\Drumidy\STM32G431KBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Drumidy.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"A:\stm32\workspace\Drumidy\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Drumidy.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
