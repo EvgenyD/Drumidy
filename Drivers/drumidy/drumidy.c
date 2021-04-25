@@ -27,7 +27,7 @@ void initDrum(DRUM* _chnl, DRM_voice _main_voice, DRM_voice _aux_voice, DRM_type
 	_chnl->peak_volume_norm		= 50;		// full volume at 4096*50%=2048
 	_chnl->peak_max_length		= 201;		// 201 	x0.1=20.1ms
 	_chnl->peak_min_length		= 3; 		// 15 	x0.1=1.5ms
-	_chnl->peak2peak 			= 2048; 	//512 mute and 2048 ramp-down
+	_chnl->peak2peak 			= 1500;//2048; 	//512 mute and 2048 ramp-down
 	// if the main pad is mesh, peaks are much longer
 	if ((_chnl_type == MESH_PAD_AUTOAUX) || (_chnl_type == MESH_RIM_AUTOAUX))
 		_chnl->peak_min_length	= 8; 		// 8 	x0.1=0.8ms
@@ -71,6 +71,12 @@ void initDrum(DRUM* _chnl, DRM_voice _main_voice, DRM_voice _aux_voice, DRM_type
 	}
 
 	_chnl->aux_last_state	= _aux_state;
+
+	_chnl->main_last_on_voice 	= 0;
+	_chnl->main_last_on_time 	= 0;
+	_chnl->aux_last_on_voice 	= 0;
+	_chnl->aux_last_on_time 	= 0;
+
 }
 
 // V 4.0
@@ -142,6 +148,7 @@ uint8_t Update_channel(DRUM* _chnl, uint32_t _adc_reading, GPIO_PinState _aux_st
 //				if (_chnl->cooldown < (_chnl->peak2peak - 512)){
 					_chnl->cooldown = 0;
 					_chnl->main_rdy_height 	= 0;
+
 //				}
 			}
 

@@ -35,6 +35,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+#define OFF_DELAY_MS 200
 #define TAB 0x09
 #define FLASH_USER_START_ADDR 	0x0801F800 		//0x0801 F800
 const volatile uint32_t *userConfig=(const volatile uint32_t *)FLASH_USER_START_ADDR;
@@ -294,8 +295,8 @@ int main(void)
   initDrum(&channel[2], SNARE , KICK 	, MESH_RIM_AUTOAUX		, aux_current_state[2]);
 	  channel[2].alt_voice = SNRIM;
 
-  initDrum(&channel[3], SNARE , KICK 	, MESH_PAD_AUTOAUX		, aux_current_state[3]);
-	  channel[3].alt_voice = SNRIM;
+  initDrum(&channel[3], SNARE , KICK 	, MESH_RIM_AUTOAUX		, aux_current_state[3]);
+	  channel[3].alt_voice = 0x40;
 
   initDrum(&channel[4], TOM1 , TOM1  	, MESH_PAD_AUTOAUX		, aux_current_state[3]);
   initDrum(&channel[5], TOM2 , TOM2  	, MESH_PAD_AUTOAUX		, aux_current_state[4]);
@@ -379,10 +380,16 @@ int main(void)
 			  if (vol < 1  ) vol = 1;
 			  channel[ch].main_rdy_volume = (uint8_t) vol;
 
+			  uint8_t vc;
 			  if (channel[ch].main_rdy_usealt)
-				  sendMidiGEN(channel[ch].alt_voice ,channel[ch].main_rdy_volume);
+				  vc = channel[ch].alt_voice;	//				  sendMidiGEN(channel[ch].alt_voice ,channel[ch].main_rdy_volume);
 			  else
-				  sendMidiGEN(channel[ch].main_voice,channel[ch].main_rdy_volume);
+				  vc = channel[ch].main_voice;	//				  sendMidiGEN(channel[ch].main_voice,channel[ch].main_rdy_volume);
+
+
+			  sendMidi(vc,channel[ch].main_rdy_volume);
+			  channel[ch].main_last_on_voice 	= vc;
+			  channel[ch].main_last_on_time 	= HAL_GetTick();
 
   			  sendDebug(ch,0);
 
@@ -428,6 +435,17 @@ int main(void)
 
 
 		  }
+		  // send off command if needed
+		  if (channel[ch].main_last_on_voice > 0){
+			  if ( HAL_GetTick() > (channel[ch].main_last_on_time + OFF_DELAY_MS) ){
+				  sendMidi(channel[ch].main_last_on_voice,0);
+				  channel[ch].main_last_on_voice = 0;
+			  }
+
+
+		  }
+
+
 	  }
 	  /* USER CODE END WHILE */
 

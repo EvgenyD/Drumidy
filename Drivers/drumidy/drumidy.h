@@ -4,6 +4,7 @@
 #include "stm32g4xx_hal.h"
 #include <string.h>
 
+
 #define DRUMSET_CHANNEL 	9	// global midi property
 #define RIM_BLOCKING_TIME 	150	// ms when rim blocks main and main blocks rim
 
@@ -127,6 +128,12 @@ typedef struct _drum
 	uint32_t aux_active_time;		// last detected peak time
 	DRM_aux_state aux_active_state;	// active state of the aux
 	DRM_aux_state aux_last_state;	// active state of the aux
+
+	uint32_t  main_last_on_time;	// tracking on-event time for delayed off
+	uint8_t   main_last_on_voice;	// tracking on-event time for delayed off
+
+	uint32_t  aux_last_on_time;		// tracking on-event time for delayed off
+	uint8_t   aux_last_on_voice;	// tracking on-event time for delayed off
 } DRUM;
 
 uint32_t STEP_TIME;					// global var for current time
