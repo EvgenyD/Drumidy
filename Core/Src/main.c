@@ -38,6 +38,8 @@
 #define OFF_DELAY_MS 200
 #define TAB 0x09
 #define FLASH_USER_START_ADDR 	0x0801F800 		//0x0801 F800
+
+#define USE_COM 	1
 const volatile uint32_t *userConfig=(const volatile uint32_t *)FLASH_USER_START_ADDR;
 
 
@@ -447,7 +449,7 @@ int main(void)
 
 
 	  }
-	  /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
@@ -462,7 +464,6 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Configure the main internal regulator output voltage
   */
@@ -495,17 +496,6 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the peripherals clocks
-  */
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_USB
-                              |RCC_PERIPHCLK_ADC12;
-  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
-  PeriphClkInit.Adc12ClockSelection = RCC_ADC12CLKSOURCE_SYSCLK;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
@@ -1015,6 +1005,9 @@ void tx_midi(uint8_t *_buffer, uint16_t len)
   while( rt == USBD_BUSY) {
 	  rt = CDC_Transmit_FS(_buffer, len);
   };
+#if USE_COM
+  HAL_UART_Transmit(&huart2,_buffer, len , 5);
+#endif
 
   TIM2->CNT = 0; // restart active sense timer
 
@@ -1022,6 +1015,7 @@ void tx_midi(uint8_t *_buffer, uint16_t len)
 
 void sendDebug(uint8_t _ch, uint8_t _aux)
 {
+#if (USE_COM == 0)
 	uint8_t voice;
 	uint8_t volume;
 	uint8_t length;
@@ -1041,6 +1035,7 @@ void sendDebug(uint8_t _ch, uint8_t _aux)
 			  length, channel[_ch].aux_status);
   }
   HAL_UART_Transmit(&huart2,(uint8_t *)buffer_out, strlen((char const*)buffer_out) , 5);
+#endif
 
   HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
@@ -1386,4 +1381,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
